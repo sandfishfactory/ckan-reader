@@ -3,21 +3,142 @@ from typing import Dict, Any
 from ckanreader.base import CkanRequest
 
 
+class Tag:
+
+    def __init__(self, result: Dict[str, Any]):
+        self.vocabulary_id = result.get("vocabulary_id", "")
+        self.display_name = result.get("display_name", "")
+        self.id = result.get("id", "")
+        self.name = result.get("name", "")
+
+    @classmethod
+    def list(cls, request: CkanRequest):
+        response = request.gets("tag_list")
+        results = response.pop("result")
+
+        name_dict_list = [{"name": name} for name in results]
+
+        tags = list()
+
+        for result in name_dict_list:
+            tag_instance = cls(result)
+            tags.append(tag_instance)
+
+        return tags
+
+    @classmethod
+    def show(cls, request: CkanRequest, id: str):
+        query = {"id": id}
+        response = request.gets("tag_show", query=query)
+
+        result = response.pop("result")
+        tag_instance = cls(result)
+
+        return tag_instance
+
+
+class Organization:
+
+    def __init__(self, result: Dict[str, Any]):
+        self.description = result.get("description", "")
+        self.created = result.get("created", "")
+        self.title = result.get("title", "")
+        self.name = result.get("name", "")
+        self.is_organization = result.get("is_organization", "")
+        self.state = result.get("state", "")
+        self.image_url = result.get("image_url", "")
+        self.revision_id = result.get("revision_id", "")
+        self.type = result.get("type", "")
+        self.id = result.get("id", "")
+        self.approval_status = result.get("approval_status", "")
+
+
+class User:
+
+    def __init__(self, result: Dict[str, Any]):
+        self.email_hash = result.get("email_hash", "")
+        self.about = result.get("about", "")
+        self.capacity = result.get("capacity", "")
+        self.name = result.get("name", "")
+        self.created = result.get("created", "")
+        self.sysadmin = result.get("sysadmin", "")
+        self.activity_streams_email_notifications = result.get(
+            "activity_streams_email_notifications", "")
+        self.state = result.get("state", "")
+        self.number_of_edits = result.get("number_of_edits", "")
+        self.display_name = result.get("display_name", "")
+        self.fullname = result.get("fullname", "")
+        self.id = result.get("id", "")
+        self.number_created_packages = result.get(
+            "number_created_packages", "")
+
+
 class Group:
 
-    def __init__(self, request: CkanRequest):
-        self.request = request
+    def __init__(self, result: Dict[str, Any]):
+
+        users = list()
+        for user in result.get("users", []):
+            user_instance = User(user)
+            users.append(user_instance)
+        self.users = users
+
+        self.display_name = result.get("display_name", "")
+        self.description = result.get("description", "")
+        self.image_display_url = result.get("image_display_url", "")
+        self.package_count = result.get("package_count", "")
+
+        self.created = result.get("created", "")
+        self.name = result.get("name", "")
+        self.is_organization = result.get("is_organization", "")
+        self.state = result.get("state", "")
+        self.extras = result.get("extras", [])
+        self.image_url = result.get("image_url", "")
+
+        groups = list()
+        for group in result.get("groups", []):
+            group_instance = Group(group)
+            groups.append(group_instance)
+        self.groups = groups
+
+        self.type = result.get("type", "")
+        self.title = result.get("title", "")
+        self.revision_id = result.get("revision_id", "")
+        self.num_followers = result.get("num_followers", "")
+        self.id = result.get("id", "")
+
+        tags = list()
+        for tag in result.get("tags", []):
+            tag_instance = Tag(tag)
+            tags.append(tag_instance)
+        self.tags = tags
+
+        self.approval_status = result.get("approval_status", "")
 
     @classmethod
     def list(cls, request: CkanRequest):
         response = request.gets("group_list")
-        return response
+        results = response.pop("result")
+
+        name_dict_list = [{"name": name} for name in results]
+
+        groups = list()
+
+        for result in name_dict_list:
+            group_instance = cls(result)
+            groups.append(group_instance)
+
+        return groups
 
     @classmethod
     def show(cls, request: CkanRequest, id: str):
         query = {"id": id}
         response = request.gets("group_show", query=query)
-        return response
+
+        result = response.pop("result")
+        group_instance = cls(result)
+
+        return group_instance
 
 
 class Package:
@@ -40,8 +161,19 @@ class Package:
         self.creator_user_id = result.get("creator_user_id", "")
         self.type = result.get("type", "")
         self.num_resources = result.get("num_resources", "")
-        self.tags = result.get("tags", [])
-        self.groups = result.get("groups", [])
+
+        tags = list()
+        for tag in result.get("tags", []):
+            tag_instance = Tag(tag)
+            tags.append(tag_instance)
+        self.tags = tags
+
+        groups = list()
+        for group in result.get("groups", []):
+            group_instance = Group(group)
+            groups.append(group_instance)
+        self.groups = groups
+
         self.creator_user_id = result.get("creator_user_id", "")
         self.relationships_as_subject = result.get(
             "relationships_as_subject", [])
@@ -101,23 +233,6 @@ class Package:
         return packages
 
 
-class Tag:
-
-    def __init__(self, request: CkanRequest):
-        self.request = request
-
-    @classmethod
-    def list(cls, request: CkanRequest):
-        response = request.gets("tag_list")
-        return response
-
-    @classmethod
-    def show(cls, request: CkanRequest, id: str):
-        query = {"id": id}
-        response = request.gets("tag_show", query=query)
-        return response
-
-
 class Resource:
 
     def __init__(self, result: Dict[str, Any]):
@@ -168,19 +283,3 @@ class PackagesActivity:
     def list(self):
         response = self.request.gets("recently_changed_packages_activity_list")
         return response
-
-
-class Organization:
-
-    def __init__(self, result: Dict[str, Any]):
-        self.description = result.get("description", "")
-        self.created = result.get("created", "")
-        self.title = result.get("title", "")
-        self.name = result.get("name", "")
-        self.is_organization = result.get("is_organization", "")
-        self.state = result.get("state", "")
-        self.image_url = result.get("image_url", "")
-        self.revision_id = result.get("revision_id", "")
-        self.type = result.get("type", "")
-        self.id = result.get("id", "")
-        self.approval_status = result.get("approval_status", "")
