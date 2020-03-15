@@ -1,2 +1,2 @@
-# ckan-wrapper
-CKANのWebAPIにアクセスするwrapperモジュールです
+# ckan-reader
+CKANのWebAPIに参照するwrapperモジュールです
