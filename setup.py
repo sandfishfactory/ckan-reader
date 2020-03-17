@@ -1,7 +1,7 @@
 from setuptools import setup
 
 
-requires = []
+requires = ["chardet>=3.0.4", "pandas>=1.0.2", "xlrd>=1.2.0"]
 
 
 setup(

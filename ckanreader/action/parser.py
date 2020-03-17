@@ -1,3 +1,5 @@
+import pandas as pd
+
 from ckanreader.base import ResourceParser
 
 
@@ -9,7 +11,9 @@ class CsvParser(ResourceParser):
         self.format = format
 
     def parse(self):
-        print("csv parser")
+        df = pd.read_csv(
+            self.file_path, index_col=0, encoding=self.encoding)
+        return df.to_dict()
 
 
 class ExcelParser(ResourceParser):
@@ -20,7 +24,9 @@ class ExcelParser(ResourceParser):
         self.format = format
 
     def parse(self):
-        print("excel parser")
+        df = pd.read_excel(
+            self.file_path, index_col=0, encoding=self.encoding)
+        return df.to_dict()
 
 
 class PdfParser:

@@ -296,7 +296,7 @@ class Resource:
 
         # ファイルタイプで判定
         if self.format.upper() == "CSV":
-            chunk_size = 100
+            chunk_size = AppConfig.ENCODE_CHECK_SIZE
             with open(local_filepath, 'rb') as f, contextlib.closing(chardet.UniversalDetector()) as detector:
                 while True:
                     chunk = f.read(chunk_size)
