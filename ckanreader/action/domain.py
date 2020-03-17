@@ -1,6 +1,13 @@
 from typing import Dict, Any
+from urllib.request import urlretrieve
+from urllib.parse import urlsplit
+import os
+import contextlib
+import chardet
 
 from ckanreader.base import CkanRequest
+from ckanreader.settings import AppConfig
+from ckanreader.action.parser import CsvParser, ExcelParser, PdfParser
 
 
 class Tag:
@@ -272,7 +279,46 @@ class Resource:
         return resources
 
     def fetch_data(self):
-        print("fetch_data")
+        if not os.path.exists(AppConfig.DOWNLOAD_PATH):
+            os.mkdir(AppConfig.DOWNLOAD_PATH)
+
+        url_item = urlsplit(self.url)
+        # urlsplitの2番目の要素はpath
+        path_item = url_item[2]
+        # /で文字列を分割して、一番最後の値がファイル名になっている
+        file_name = path_item.split("/")[-1]
+        local_filepath = os.path.join(AppConfig.DOWNLOAD_PATH, file_name)
+
+        if os.path.exists(local_filepath):
+            os.remove(local_filepath)
+        # ファイルダウンロード
+        urlretrieve(self.url, local_filepath)
+
+        # ファイルタイプで判定
+        if self.format.upper() == "CSV":
+            chunk_size = 100
+            with open(local_filepath, 'rb') as f, contextlib.closing(chardet.UniversalDetector()) as detector:
+                while True:
+                    chunk = f.read(chunk_size)
+                    if not chunk:
+                        break
+                    # chunk_sizeずつfeed
+                    detector.feed(chunk)
+                    # 推定結果が定まるとdetector.doneがTrueになる
+                    if detector.done:
+                        break
+            enc = detector.result['encoding']
+            end = enc.lower()
+
+            return CsvParser(local_filepath, enc, self.format)
+
+        elif self.format.upper() == "XLS" or self.format.upper() == "XLSX":
+            return ExcelParser(local_filepath, self.format)
+
+        elif self.format.upper() == "PDF":
+            return PdfParser(local_filepath, "", self.format)
+        else:
+            return None
 
 
 class PackagesActivity:

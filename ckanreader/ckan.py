@@ -31,7 +31,6 @@ class RequestV3(CkanRequest):
             ';' if p.params else '', p.params,
             '?' if p.query else '', query,
             '#' if p.fragment else '', p.fragment)
-        print("url:{}".format(url))
         req = Request(url, headers=headers, method="GET")
         try:
             with urlopen(req) as res:
