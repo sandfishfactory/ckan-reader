@@ -240,25 +240,25 @@ class Package:
 class Resource:
 
     def __init__(self, result: Dict[str, Any]):
-        self.mimetype = result["mimetype"]
-        self.cache_url = result["cache_url"]
-        self.state = result["state"]
-        self.hash = result["hash"]
-        self.description = result["description"]
-        self.format = result["format"]
-        self.url = result["url"]
-        self.created = result["created"]
-        self.cache_last_updated = result["cache_last_updated"]
-        self.package_id = result["package_id"]
-        self.mimetype_inner = result["mimetype_inner"]
-        self.last_modified = result["last_modified"]
-        self.position = result["position"]
-        self.revision_id = result["revision_id"]
-        self.size = result["size"]
-        self.url_type = result["url_type"]
-        self.id = result["id"]
-        self.resource_type = result["resource_type"]
-        self.name = result["name"]
+        self.mimetype = result.get("mimetype")
+        self.cache_url = result.get("cache_url")
+        self.state = result.get("state")
+        self.hash = result.get("hash")
+        self.description = result.get("description")
+        self.format = result.get("format")
+        self.url = result.get("url")
+        self.created = result.get("created")
+        self.cache_last_updated = result.get("cache_last_updated")
+        self.package_id = result.get("package_id")
+        self.mimetype_inner = result.get("mimetype_inner")
+        self.last_modified = result.get("last_modified")
+        self.position = result.get("position")
+        self.revision_id = result.get("revision_id")
+        self.size = result.get("size")
+        self.url_type = result.get("url_type")
+        self.id = result.get("id")
+        self.resource_type = result.get("resource_type")
+        self.name = result.get("name")
 
     @classmethod
     def search(cls, request: CkanRequest, name: str, value: str) -> List:

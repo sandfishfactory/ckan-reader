@@ -23,14 +23,7 @@ class RequestV3(CkanRequest):
         return self.__ckan_request(req_headers, req_url)
 
     def __ckan_request(self, headers, url) -> Dict:
-
-        p = urlparse(url)
-        query = quote_plus(p.query, safe='=&')
-        url = '{}://{}{}{}{}{}{}{}{}'.format(
-            p.scheme, p.netloc, p.path,
-            ';' if p.params else '', p.params,
-            '?' if p.query else '', query,
-            '#' if p.fragment else '', p.fragment)
+        print("url:{}".format(url))
         req = Request(url, headers=headers, method="GET")
         try:
             with urlopen(req) as res:
